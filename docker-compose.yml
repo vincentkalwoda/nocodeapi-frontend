@@ -1,7 +1,7 @@
 services:
   angular:
     container_name: nocodeapi-angular
-    build: ./frontend
+    build: .
     restart: always
     pull_policy: build
     ports:
