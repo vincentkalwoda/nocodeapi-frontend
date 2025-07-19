@@ -8,6 +8,6 @@ export class UrlService {
   constructor() { }
 
   getUrl(): string {
-    return 'https://empleo.at:5443/api/v1';
+    return 'https://localhost:5443/api/v1';
   }
 }
