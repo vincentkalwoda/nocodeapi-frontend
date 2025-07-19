@@ -1,0 +1,32 @@
+
+.glass, ::ng-deep .p-dialog, ::ng-deep .p-dialog-draggable {
+  background: rgba(26, 0, 51, 0.3) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(1, 39, 215, 0.5);
+}
+
+.status-online {
+  background: linear-gradient(135deg, #00FFA3, #00cc82);
+}
+
+.status-offline {
+  background: linear-gradient(135deg, #FF3B6A, #cc2e54);
+}
+
+.status-maintenance {
+  background: linear-gradient(135deg, #FFC300, #cc9c00);
+}
+
+.api-card:hover {
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+.metric-badge {
+  background: rgba(1, 39, 215, 0.1);
+  border: 1px solid rgba(1, 39, 215, 0.3);
+}

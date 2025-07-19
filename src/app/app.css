@@ -1,0 +1,14 @@
+.gradient-bg {
+  background: linear-gradient(135deg, #000000 0%, #011257 30%, rgb(2, 32, 180) 50%, #22016e 75%, #000000 95%);
+}
+
+.glass {
+  backdrop-filter: blur(10px);
+  background: rgba(0, 14, 51, 0.37);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 30px rgba(1, 39, 215, 0.5);
+}
+

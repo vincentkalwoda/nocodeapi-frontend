@@ -1,0 +1,107 @@
+.content {
+  margin: 2vw;
+}
+
+.box {
+  padding: 3vw 2vw;
+  border-radius: 10px;
+  background-color: white;
+  -webkit-box-shadow: 0px 0px 8px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0px 0px 8px 2px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.box2 {
+  padding: 3vw 2vw;
+  border-radius: 10px;
+  background-color: white;
+  -webkit-box-shadow: 0px 0px 8px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0px 0px 8px 2px rgba(0, 0, 0, 0.05);
+  display: flex;
+}
+
+
+.main-content {
+  display: flex;
+  align-items: center;
+  gap: 1vw;
+}
+
+.circle {
+  width: 3.5vw;
+  height: 3.5vw;
+  border-radius: 50%;
+  background-color: #f3f3f3;
+  font-size: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.circle i {
+  color: var(--color-5);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.desc {
+  color: #858585;
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.number {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--color-5);
+  margin-top: 0.5vw;
+}
+
+.detail {
+  margin-top: 0.5vw;
+  font-size: 1rem;
+  color: #858585;
+}
+
+.positive {
+  color: #01c901;
+}
+
+.negative {
+  color: red;
+}
+
+.smaller-text {
+  font-size: 0.85rem;
+  color: #858585;
+}
+
+.flex {
+  display: flex;
+  gap: 2vw;
+}
+
+.flex-1 {
+  flex: 1 1 0%;
+}
+
+.mt-5 {
+  margin-top: 1.25rem
+}
+
+.chart {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+::ng-deep canvas {
+  width: 100%;
+  max-width: 100%;
+  height: 300px;
+}

@@ -1,0 +1,38 @@
+<p-toast></p-toast>
+<nav class="fixed w-full z-50 glass">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <div class="flex items-center">
+        <img src="/logo.png" class="w-12" alt="" routerLink="">
+      </div>
+      <div class="hidden md:flex space-x-8">
+        <a href="#features" class="text-body hover:text-secondary transition-colors">Features</a>
+        <a href="#pricing" class="text-body hover:text-secondary transition-colors">Pricing</a>
+        <a href="#about" class="text-body hover:text-secondary transition-colors">About</a>
+        <a href="#contact" class="text-body hover:text-secondary transition-colors">Contact</a>
+      </div>
+      <img *ngIf="loggedIn"
+           [src]="'https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg'"
+           class="h-9 w-9 rounded-full"
+           alt="default-avatar"
+           draggable="false"
+           routerLink="/app/dashboard">
+      <div class="flex space-x-4" *ngIf="!loggedIn">
+        <button
+          *ngIf="router.url !== '/register'"
+          class="px-6 py-2 text-white rounded-lg transition-all hover:shadow-[0_0_30px_rgba(1,39,215,0.5)] hover:scale-105"
+          [ngClass]="{'bg-accent': router.url !== '/login', 'bg-none': router.url === '/login', 'text-white': router.url != '/login', 'text-accent': router.url === '/login', 'border-2': router.url === '/login', 'border-accent': router.url === '/login',}"
+          routerLink="login">Login
+        </button>
+        <button
+          *ngIf="router.url === '/register'"
+          class="px-6 py-2 text-white rounded-lg transition-all hover:shadow-[0_0_30px_rgba(1,39,215,0.5)] hover:scale-105"
+          [ngClass]="{'bg-accent': router.url !== '/register', 'bg-none': router.url === '/register', 'text-white': router.url != '/register', 'text-accent': router.url === '/register', 'border-2': router.url === '/register', 'border-accent': router.url === '/register',}"
+          routerLink="register">Register
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+<router-outlet></router-outlet>
+

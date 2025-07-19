@@ -1,0 +1,939 @@
+<div class="md:ml-1 min-h-screen p-6">
+  <div class="mb-6">
+    <div class="flex items-center gap-3 mb-4">
+      <button (click)="window.history.back()" class="text-white hover:text-blue-400 transition-colors">
+        <i class="pi pi-arrow-left text-xl"></i>
+      </button>
+      <div class="flex items-center gap-3">
+        <div class="bg-surface rounded-full w-12 h-12 flex items-center justify-center">
+          <i class="pi pi-shield text-xl text-primary"></i>
+        </div>
+        <div>
+          <h1 class="text-3xl font-bold text-white">{{ api?.name }}</h1>
+          <p class="text-muted">{{ api?.description }}</p>
+        </div>
+      </div>
+      <div class="ml-auto flex gap-3">
+        <div *ngIf="!state" class="rounded-lg p-2 flex items-center gap-2 cursor-pointer">
+          <i class="pi pi-play text-green"></i>
+        </div>
+        <div *ngIf="state" class="rounded-lg bg-green p-2 flex items-center gap-2 cursor-pointer">
+          <i class="pi pi-replay text-white"></i>
+        </div>
+        <div *ngIf="state" class="rounded-lg bg-error p-2 flex items-center gap-2 cursor-pointer">
+          <i class="pi pi-stop text-white"></i>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="api?.entities && api?.entities?.length!==0" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div class="metric-badge rounded-lg px-4 py-3">
+        <p class="text-xs text-muted">Total Requests</p>
+        <p class="text-xl font-bold text-primary">{{ stats.totalRequests }}</p>
+      </div>
+      <div class="metric-badge rounded-lg px-4 py-3">
+        <p class="text-xs text-muted">Avg Response</p>
+        <p class="text-xl font-bold text-primary">{{ stats.averageResponseTime }}ms</p>
+      </div>
+      <div class="metric-badge rounded-lg px-4 py-3">
+        <p class="text-xs text-muted">Success Rate</p>
+        <p class="text-xl font-bold text-success">{{ stats.successRate * 100 }}%</p>
+      </div>
+      <div class="metric-badge rounded-lg px-4 py-3">
+        <p class="text-xs text-muted">Version</p>
+        <p class="text-xl font-bold text-white">v{{ stats.apiVersion }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!api?.entities" class="flex flex-col h-[calc(100vh-230px)] w-full mx-auto">
+    <!-- Chat Header -->
+    <div class="text-center -mt-6 mb-2">
+      <h2 class="text-2xl font-bold text-white mb-2">Generate API Structure</h2>
+      <p class="text-muted">Describe your API requirements to generate the structure</p>
+    </div>
+
+    <div class="flex-1 overflow-y-auto mb-6 space-y-4 pr-2 custom-scrollbar"
+         #messagesContainer>
+
+      <div *ngIf="messages.length === 0" class="flex justify-center">
+        <div class="glass rounded-lg p-6 max-w-md text-center">
+          <i class="pi pi-comments text-3xl text-primary mb-3"></i>
+          <p class="text-muted mb-4">Start a conversation to generate your API structure</p>
+        </div>
+      </div>
+
+      <div *ngFor="let message of messages" class="flex"
+           [ngClass]="message.role === 'USER' ? 'justify-end' : 'justify-start'">
+
+        <div *ngIf="message.role === 'USER'" class="flex items-start gap-3 max-w-[80%]">
+          <div class="message-user rounded-lg px-4 py-2 whitespace-pre-wrap break-words">
+            <p class="text-white whitespace-pre-wrap">{{ message.content }}</p>
+          </div>
+        </div>
+
+        <div *ngIf="message.role === 'SYSTEM'" class="flex items-start gap-3 max-w-[70%]">
+          <div class="message-assistant rounded-lg px-4 py-2 glass whitespace-pre-wrap break-words relative">
+            <div *ngFor="let entity of message.model.entities" class="mb-6 last:mb-0">
+              <!-- Entity Header -->
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                  <i class="pi pi-database text-white text-sm"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white">{{ entity.name }}</h3>
+              </div>
+
+              <!-- Table Container -->
+              <div class="glass rounded-lg overflow-hidden border border-gray-700/50">
+                <!-- Desktop Table View (hidden on mobile) -->
+                <div class="hidden md:block overflow-x-auto">
+                  <table class="w-full">
+                    <!-- Table Header -->
+                    <thead class="bg-gray-800/50 border-b border-gray-700/50">
+                    <tr>
+                      <th class="px-4 py-3 text-left text-sm font-semibold text-white">Field</th>
+                      <th class="px-4 py-3 text-left text-sm font-semibold text-white">Type</th>
+                      <th class="px-4 py-3 text-left text-sm font-semibold text-white">Constraints</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-700/50">
+                    <tr *ngFor="let field of entity.fields; let i = index"
+                        class="hover:bg-gray-800/30 transition-colors">
+                      <td class="px-4 py-3">
+                        <span class="text-white font-medium">{{ field.name }}</span>
+                      </td>
+
+                      <td class="px-4 py-3">
+                  <span
+                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-muted border border-muted">
+                    {{ field.type }}
+                  </span>
+                      </td>
+
+                      <td class="px-4 py-3">
+                        <div class="flex flex-wrap gap-1">
+                    <span *ngFor="let constraint of field.constraints | keyvalue"
+                          class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium transition-colors"
+                          [ngClass]="getConstraintClass(constraint.key)">
+
+
+                      <ng-container [ngSwitch]="constraint.key">
+                        <ng-container *ngSwitchCase="'FOREIGN_KEY'">
+                          <i class="pi pi-link text-xs mr-1"></i>
+                          FK: {{ getForeignKeyInfo(constraint.value) }}
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'PRIMARY_KEY'">
+                          <i class="pi pi-key text-xs mr-1"></i>
+                          <span>PRIMARY KEY</span>
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'NOT_NULL'">
+                          <i class="pi pi-exclamation-triangle text-xs mr-1"></i>
+                          NOT NULL
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'UNIQUE'">
+                          <i class="pi pi-star text-xs mr-1"></i>
+                          UNIQUE
+                        </ng-container>
+                        <ng-container *ngSwitchCase="'AUTO_INCREMENT'">
+                          <i class="pi pi-plus text-xs mr-1"></i>
+                          AUTO INCREMENT
+                        </ng-container>
+                        <ng-container *ngSwitchDefault>
+                          <i class="pi pi-cog text-xs mr-1"></i>
+                          {{ constraint.key }}<span *ngIf="constraint.value">: {{ constraint.value }}</span>
+                        </ng-container>
+                      </ng-container>
+                    </span>
+
+                          <span *ngIf="!field.constraints || (field.constraints | keyvalue).length === 0"
+                                class="text-muted text-xs italic">
+                      No constraints
+                    </span>
+                        </div>
+                      </td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="md:hidden">
+                  <div class="divide-y divide-gray-700/50">
+                    <div *ngFor="let field of entity.fields; let i = index"
+                         class="p-4 hover:bg-gray-800/30 transition-colors grid grid-cols-1 gap-4">
+
+                      <div class="block items-center mb-3 space-y-1.5 text-center">
+                        <h3 class="text-white font-semibold text-base">{{ field.name }}</h3>
+                        <span
+                          class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-muted border border-muted mx-auto">
+                          {{ field.type }}
+                        </span>
+                      </div>
+
+                      <div class="space-y-2">
+                        <div class="text-sm text-muted font-medium">Constraints:</div>
+                        <div class="flex flex-wrap gap-1">
+          <span *ngFor="let constraint of field.constraints | keyvalue"
+                class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium transition-colors whitespace-normal break-words overflow-hidden text-ellipsis"
+                [ngClass]="getConstraintClass(constraint.key)">
+
+                <ng-container [ngSwitch]="constraint.key">
+                  <ng-container *ngSwitchCase="'FOREIGN_KEY'">
+                    <i class="pi pi-link text-xs mr-1"></i>
+                    FK: {{ getForeignKeyInfo(constraint.value) }}
+                  </ng-container>
+                  <ng-container *ngSwitchCase="'PRIMARY_KEY'">
+                    <i class="pi pi-key text-xs mr-1"></i>
+                    <span>PRIMARY KEY</span>
+                  </ng-container>
+                  <ng-container *ngSwitchCase="'NOT_NULL'">
+                    <i class="pi pi-exclamation-triangle text-xs mr-1"></i>
+                    NOT NULL
+                  </ng-container>
+                  <ng-container *ngSwitchCase="'UNIQUE'">
+                    <i class="pi pi-star text-xs mr-1"></i>
+                    UNIQUE
+                  </ng-container>
+                  <ng-container *ngSwitchCase="'AUTO_INCREMENT'">
+                    <i class="pi pi-plus text-xs mr-1"></i>
+                    AUTO INCREMENT
+                  </ng-container>
+                  <ng-container *ngSwitchDefault>
+                    <i class="pi pi-cog text-xs mr-1"></i>
+                    <span class="break-all">{{ constraint.key }}<span
+                      *ngIf="constraint.value">: {{ constraint.value }}</span></span>
+                  </ng-container>
+                </ng-container>
+          </span>
+
+                          <span *ngIf="!field.constraints || (field.constraints | keyvalue).length === 0"
+                                class="text-gray-500 text-xs italic">
+                            No constraints
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button
+              class="absolute -bottom-3 -right-2 bg-primary hover:bg-primary/80 text-white text-xs px-3 py-1 rounded-full transition-all duration-200 hover:scale-105 shadow-lg"
+              (click)="useTemplate(message.model)">
+              <i class="pi pi-check text-xs mr-1"></i>
+              Use Template
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="isTyping" class="flex justify-start">
+        <div class="flex items-start gap-3 max-w-[70%]">
+          <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+            <i class="pi pi-robot text-white text-sm"></i>
+          </div>
+          <div class="message-assistant rounded-lg px-4 py-3 bg-gray-800/50 border border-gray-700/50">
+            <div class="typing-indicator">
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+              <div class="typing-dot"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Container -->
+    <div class="input-container rounded-xl p-4 glass">
+      <div class="flex items-end gap-3">
+        <div class="flex-1">
+          <textarea
+            [(ngModel)]="promptInput"
+            id="promptInput"
+            class="w-full text-white placeholder-gray-400 resize-none outline-none"
+            placeholder="Describe your API requirements..."
+            rows="1"
+            (input)="onTextareaInput($event)"
+            (keydown)="onTextareaKeyDown($event)"
+            [disabled]="isTyping"
+          ></textarea>
+        </div>
+        <button
+          id="sendButton"
+          class="send-button rounded-lg bg-blue-600 hover:bg-blue-700 p-3 text-white flex items-center justify-center min-w-[36px] h-9 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          (click)="sendMessage()"
+          [disabled]="isTyping || !promptInput.trim()"
+        >
+          <i class="pi pi-send text-sm"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <p-tabView *ngIf="api?.entities && api?.entities?.length!==0">
+    <p-tabPanel header="Entities">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold text-white">API Entities</h2>
+        <button class="bg-primary rounded-lg text-white px-4 py-2 font-bold hover-glow transition-colors">
+          <i class="pi pi-plus mr-2"></i>Add Entity
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- User Entity -->
+        <div *ngFor="let entity of api?.entities" class="glass rounded-lg p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <i class="pi pi-user text-primary text-xl"></i>
+              <h3 class="text-lg font-bold text-white">{{ entity.name }}</h3>
+            </div>
+            <div class="flex gap-2">
+              <button class="text-primary hover:text-hover">
+                <i class="pi pi-pencil"></i>
+              </button>
+              <button class="text-error hover:text-red-400">
+                <i class="pi pi-trash"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <div *ngFor="let field of entity.fields"
+                 class="flex items-center justify-between py-2 border-b border-gray-700">
+              <span class="text-white">{{ field.name }}</span>
+              <span class="text-muted text-sm">{{ field.type }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </p-tabPanel>
+    <p-tabPanel header="Endpoints">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold text-white">API Endpoints</h2>
+        <button class="bg-primary rounded-lg text-white px-4 py-2 font-bold hover-glow transition-colors">
+          <i class="pi pi-plus mr-2"></i>Add Endpoint
+        </button>
+      </div>
+
+      <div class="space-y-4">
+        <!-- POST Login Endpoint -->
+        <div class="glass rounded-lg p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <span class="method-post px-3 py-1 rounded-full text-xs font-bold text-white">POST</span>
+              <div>
+                <h3 class="text-lg font-bold text-white">/auth/login</h3>
+                <p class="text-sm text-muted">Authenticate user and create session</p>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <button class="text-primary hover:text-hover">
+                <i class="pi pi-code"></i>
+              </button>
+              <button class="text-primary hover:text-hover">
+                <i class="pi pi-pencil"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="collapse-content">
+            <div class="json-example rounded-lg p-4 text-sm custom-scrollbar overflow-x-auto">
+              <div class="mb-4">
+                <h4 class="text-primary font-bold mb-2">Request:</h4>
+                <pre class="text-white">&#123;
+                "email": "user&#64;example.com",
+                "password": "securePassword123"
+&#125;</pre>
+              </div>
+              <div>
+                <h4 class="text-success font-bold mb-2">Response:</h4>
+                <pre class="text-white">&#123;
+                "success": true,
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                "user": &#123;
+                  "id": "550e8400-e29b-41d4-a716-446655440000",
+                    "email": "user&#64;example.com",
+                    "username": "johndoe",
+                    "createdAt": "2024-01-15T10:30:00Z",
+                    "isActive": true
+                  &#125;,
+  "expiresAt": "2024-01-16T10:30:00Z"
+&#125;</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- GET User Profile Endpoint -->
+        <div class="glass rounded-lg p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <span class="method-get px-3 py-1 rounded-full text-xs font-bold text-white">GET</span>
+              <div>
+                <h3 class="text-lg font-bold text-white">/user/profile</h3>
+                <p class="text-sm text-muted">Get authenticated user profile</p>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <button class="text-primary hover:text-hover">
+                <i class="pi pi-code"></i>
+              </button>
+              <button class="text-primary hover:text-hover">
+                <i class="pi pi-pencil"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="collapse-content">
+            <div class="json-example rounded-lg p-4 text-sm custom-scrollbar overflow-x-auto">
+              <div class="mb-4">
+                <h4 class="text-primary font-bold mb-2">Headers:</h4>
+                <pre class="text-white">Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</pre>
+              </div>
+              <div>
+                <h4 class="text-success font-bold mb-2">Response:</h4>
+                <pre class="text-white">&#123;
+                "success": true,
+                "user": &#123;
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "email": "user&#64;example.com",
+    "username": "johndoe",
+    "createdAt": "2024-01-15T10:30:00Z",
+    "isActive": true
+  &#125;
+&#125;</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PUT Update User Endpoint -->
+        <div class="glass rounded-lg p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <span class="method-put px-3 py-1 rounded-full text-xs font-bold text-white">PUT</span>
+              <div>
+                <h3 class="text-lg font-bold text-white">/user/profile</h3>
+                <p class="text-sm text-muted">Update user profile information</p>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <button class="text-primary hover:text-hover">
+                <i class="pi pi-code"></i>
+              </button>
+              <button class="text-primary hover:text-hover">
+                <i class="pi pi-pencil"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="collapse-content">
+            <div class="json-example rounded-lg p-4 text-sm custom-scrollbar overflow-x-auto">
+              <div class="mb-4">
+                <h4 class="text-primary font-bold mb-2">Request:</h4>
+                <pre class="text-white">&#123;
+                "username": "newusername",
+                "email": "newemail&#64;example.com"
+                &#125;
+              </pre>
+              </div>
+              <div>
+                <h4 class="text-success font-bold mb-2">Response:</h4>
+                <pre class="text-white">
+                &#123;
+                "success": true,
+                "message": "Profile updated successfully",
+                "user": &#123;
+                  "id": "550e8400-e29b-41d4-a716-446655440000",
+                    "email": "newemail&#64;example.com",
+                    "username": "newusername",
+                    "createdAt": "2024-01-15T10:30:00Z",
+                    "isActive": true
+                  &#125;
+                &#125;</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DELETE Logout Endpoint -->
+        <div class="glass rounded-lg p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <span class="method-delete px-3 py-1 rounded-full text-xs font-bold text-white">DELETE</span>
+              <div>
+                <h3 class="text-lg font-bold text-white">/auth/logout</h3>
+                <p class="text-sm text-muted">Logout user and invalidate session</p>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <button class="text-primary hover:text-hover">
+                <i class="pi pi-code"></i>
+              </button>
+              <button class="text-primary hover:text-hover">
+                <i class="pi pi-pencil"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="collapse-content">
+            <div class="json-example rounded-lg p-4 text-sm custom-scrollbar overflow-x-auto">
+              <div class="mb-4">
+                <h4 class="text-primary font-bold mb-2">Headers:</h4>
+                <pre class="text-white">Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</pre>
+              </div>
+              <div>
+                <h4 class="text-success font-bold mb-2">Response:</h4>
+                <pre class="text-white">
+                &#123;
+                "success": true,
+                "message": "Logged out successfully"
+
+                &#125;</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </p-tabPanel>
+    <p-tabPanel header="Settings">
+      <h2 class="text-xl font-bold text-white mb-6">API Settings</h2>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- General Settings -->
+        <div class="glass rounded-lg p-6">
+          <h3 class="text-lg font-bold text-white mb-4">General Settings</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-white mb-2">API Name</label>
+              <input type="text" [(ngModel)]="api.name"
+                     class="w-full px-3 py-2 rounded-lg glass text-white outline-none focus:ring-2 focus:ring-primary">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-white mb-2">Description</label>
+              <textarea
+                class="w-full px-3 py-2 rounded-lg glass text-white outline-none focus:ring-2 focus:ring-primary"
+                rows="3" [(ngModel)]="api.description"></textarea>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-white mb-2">Version</label>
+              <input type="text" value="v1"
+                     class="w-full px-3 py-2 rounded-lg glass text-white outline-none focus:ring-2 focus:ring-primary">
+            </div>
+          </div>
+        </div>
+
+        <!-- Security Settings -->
+        <div class="glass rounded-lg p-6">
+          <h3 class="text-lg font-bold text-white mb-4">Security Settings</h3>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="text-white">Rate Limiting</span>
+              <input type="checkbox" checked class="w-5 h-5 text-primary">
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-white">API Key Required</span>
+              <input type="checkbox" checked class="w-5 h-5 text-primary">
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-white">CORS Enabled</span>
+              <input type="checkbox" checked class="w-5 h-5 text-primary">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-white mb-2">Rate Limit (requests/minute)</label>
+              <input type="number" value="1000"
+                     class="w-full px-3 py-2 rounded-lg glass text-white outline-none focus:ring-2 focus:ring-primary">
+            </div>
+          </div>
+        </div>
+      </div>
+    </p-tabPanel>
+  </p-tabView>
+
+  <!-- Tabs -->
+  <div class="flex gap-2 mb-6 overflow-x-auto hidden">
+    <button
+      class="tab-button px-4 py-2 rounded-lg glass text-white hover:bg-primary transition-colors whitespace-nowrap active"
+      onclick="switchTab('entities')">
+      Entities
+    </button>
+    <button
+      class="tab-button px-4 py-2 rounded-lg glass text-white hover:bg-primary transition-colors whitespace-nowrap"
+      onclick="switchTab('endpoints')">
+      Endpoints
+    </button>
+    <button
+      class="tab-button px-4 py-2 rounded-lg glass text-white hover:bg-primary transition-colors whitespace-nowrap"
+      onclick="switchTab('settings')">
+      Settings
+    </button>
+  </div>
+
+  <!-- Entities Tab -->
+  <div *ngIf="api?.entities && api?.entities?.length!==0" id="entities-tab" class="tab-content hidden">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-xl font-bold text-white">API Entities</h2>
+      <button class="bg-primary rounded-lg text-white px-4 py-2 font-bold hover-glow transition-colors">
+        <i class="pi pi-plus mr-2"></i>Add Entity
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- User Entity -->
+      <div class="glass rounded-lg p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <i class="pi pi-user text-primary text-xl"></i>
+            <h3 class="text-lg font-bold text-white">User</h3>
+          </div>
+          <div class="flex gap-2">
+            <button class="text-primary hover:text-hover">
+              <i class="pi pi-pencil"></i>
+            </button>
+            <button class="text-error hover:text-red-400">
+              <i class="pi pi-trash"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <div class="flex items-center justify-between py-2 border-b border-gray-700">
+            <span class="text-white">id</span>
+            <span class="text-muted text-sm">UUID</span>
+          </div>
+          <div class="flex items-center justify-between py-2 border-b border-gray-700">
+            <span class="text-white">email</span>
+            <span class="text-muted text-sm">String</span>
+          </div>
+          <div class="flex items-center justify-between py-2 border-b border-gray-700">
+            <span class="text-white">username</span>
+            <span class="text-muted text-sm">String</span>
+          </div>
+          <div class="flex items-center justify-between py-2 border-b border-gray-700">
+            <span class="text-white">password</span>
+            <span class="text-muted text-sm">String</span>
+          </div>
+          <div class="flex items-center justify-between py-2 border-b border-gray-700">
+            <span class="text-white">createdAt</span>
+            <span class="text-muted text-sm">DateTime</span>
+          </div>
+          <div class="flex items-center justify-between py-2">
+            <span class="text-white">isActive</span>
+            <span class="text-muted text-sm">Boolean</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Session Entity -->
+      <div class="glass rounded-lg p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <i class="pi pi-key text-primary text-xl"></i>
+            <h3 class="text-lg font-bold text-white">Session</h3>
+          </div>
+          <div class="flex gap-2">
+            <button class="text-primary hover:text-hover">
+              <i class="pi pi-pencil"></i>
+            </button>
+            <button class="text-error hover:text-red-400">
+              <i class="pi pi-trash"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <div class="flex items-center justify-between py-2 border-b border-gray-700">
+            <span class="text-white">id</span>
+            <span class="text-muted text-sm">UUID</span>
+          </div>
+          <div class="flex items-center justify-between py-2 border-b border-gray-700">
+            <span class="text-white">userId</span>
+            <span class="text-muted text-sm">UUID</span>
+          </div>
+          <div class="flex items-center justify-between py-2 border-b border-gray-700">
+            <span class="text-white">token</span>
+            <span class="text-muted text-sm">String</span>
+          </div>
+          <div class="flex items-center justify-between py-2 border-b border-gray-700">
+            <span class="text-white">expiresAt</span>
+            <span class="text-muted text-sm">DateTime</span>
+          </div>
+          <div class="flex items-center justify-between py-2">
+            <span class="text-white">ipAddress</span>
+            <span class="text-muted text-sm">String</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Endpoints Tab -->
+  <div *ngIf="api?.entities && api?.entities?.length!==0" id="endpoints-tab" class="tab-content hidden">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-xl font-bold text-white">API Endpoints</h2>
+      <button class="bg-primary rounded-lg text-white px-4 py-2 font-bold hover-glow transition-colors">
+        <i class="pi pi-plus mr-2"></i>Add Endpoint
+      </button>
+    </div>
+
+    <div class="space-y-4">
+      <!-- POST Login Endpoint -->
+      <div class="glass rounded-lg p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <span class="method-post px-3 py-1 rounded-full text-xs font-bold text-white">POST</span>
+            <div>
+              <h3 class="text-lg font-bold text-white">/auth/login</h3>
+              <p class="text-sm text-muted">Authenticate user and create session</p>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button class="text-primary hover:text-hover">
+              <i class="pi pi-code"></i>
+            </button>
+            <button class="text-primary hover:text-hover">
+              <i class="pi pi-pencil"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="collapse-content" id="login-example">
+          <div class="json-example rounded-lg p-4 text-sm custom-scrollbar overflow-x-auto">
+            <div class="mb-4">
+              <h4 class="text-primary font-bold mb-2">Request:</h4>
+              <pre class="text-white">&#123;
+                "email": "user&#64;example.com",
+                "password": "securePassword123"
+&#125;</pre>
+            </div>
+            <div>
+              <h4 class="text-success font-bold mb-2">Response:</h4>
+              <pre class="text-white">&#123;
+                "success": true,
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                "user": &#123;
+                  "id": "550e8400-e29b-41d4-a716-446655440000",
+                    "email": "user&#64;example.com",
+                    "username": "johndoe",
+                    "createdAt": "2024-01-15T10:30:00Z",
+                    "isActive": true
+                  &#125;,
+  "expiresAt": "2024-01-16T10:30:00Z"
+&#125;</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GET User Profile Endpoint -->
+      <div class="glass rounded-lg p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <span class="method-get px-3 py-1 rounded-full text-xs font-bold text-white">GET</span>
+            <div>
+              <h3 class="text-lg font-bold text-white">/user/profile</h3>
+              <p class="text-sm text-muted">Get authenticated user profile</p>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button class="text-primary hover:text-hover">
+              <i class="pi pi-code"></i>
+            </button>
+            <button class="text-primary hover:text-hover">
+              <i class="pi pi-pencil"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="collapse-content" id="profile-example">
+          <div class="json-example rounded-lg p-4 text-sm custom-scrollbar overflow-x-auto">
+            <div class="mb-4">
+              <h4 class="text-primary font-bold mb-2">Headers:</h4>
+              <pre class="text-white">Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</pre>
+            </div>
+            <div>
+              <h4 class="text-success font-bold mb-2">Response:</h4>
+              <pre class="text-white">&#123;
+                "success": true,
+                "user": &#123;
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "email": "user&#64;example.com",
+    "username": "johndoe",
+    "createdAt": "2024-01-15T10:30:00Z",
+    "isActive": true
+  &#125;
+&#125;</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PUT Update User Endpoint -->
+      <div class="glass rounded-lg p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <span class="method-put px-3 py-1 rounded-full text-xs font-bold text-white">PUT</span>
+            <div>
+              <h3 class="text-lg font-bold text-white">/user/profile</h3>
+              <p class="text-sm text-muted">Update user profile information</p>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button class="text-primary hover:text-hover">
+              <i class="pi pi-code"></i>
+            </button>
+            <button class="text-primary hover:text-hover">
+              <i class="pi pi-pencil"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="collapse-content" id="update-example">
+          <div class="json-example rounded-lg p-4 text-sm custom-scrollbar overflow-x-auto">
+            <div class="mb-4">
+              <h4 class="text-primary font-bold mb-2">Request:</h4>
+              <pre class="text-white">&#123;
+                "username": "newusername",
+                "email": "newemail&#64;example.com"
+                &#125;
+              </pre>
+            </div>
+            <div>
+              <h4 class="text-success font-bold mb-2">Response:</h4>
+              <pre class="text-white">
+                &#123;
+                "success": true,
+                "message": "Profile updated successfully",
+                "user": &#123;
+                  "id": "550e8400-e29b-41d4-a716-446655440000",
+                    "email": "newemail&#64;example.com",
+                    "username": "newusername",
+                    "createdAt": "2024-01-15T10:30:00Z",
+                    "isActive": true
+                  &#125;
+                &#125;</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DELETE Logout Endpoint -->
+      <div class="glass rounded-lg p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <span class="method-delete px-3 py-1 rounded-full text-xs font-bold text-white">DELETE</span>
+            <div>
+              <h3 class="text-lg font-bold text-white">/auth/logout</h3>
+              <p class="text-sm text-muted">Logout user and invalidate session</p>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button class="text-primary hover:text-hover">
+              <i class="pi pi-code"></i>
+            </button>
+            <button class="text-primary hover:text-hover">
+              <i class="pi pi-pencil"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="collapse-content" id="logout-example">
+          <div class="json-example rounded-lg p-4 text-sm custom-scrollbar overflow-x-auto">
+            <div class="mb-4">
+              <h4 class="text-primary font-bold mb-2">Headers:</h4>
+              <pre class="text-white">Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</pre>
+            </div>
+            <div>
+              <h4 class="text-success font-bold mb-2">Response:</h4>
+              <pre class="text-white">
+                &#123;
+                "success": true,
+                "message": "Logged out successfully"
+
+                &#125;</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Tab -->
+  <div *ngIf="api?.entities && api?.entities?.length!==0" id="settings-tab" class="tab-content hidden">
+    <h2 class="text-xl font-bold text-white mb-6">API Settings</h2>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- General Settings -->
+      <div class="glass rounded-lg p-6">
+        <h3 class="text-lg font-bold text-white mb-4">General Settings</h3>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-white mb-2">API Name</label>
+            <input type="text" value="User Authentication API"
+                   class="w-full px-3 py-2 rounded-lg glass text-white outline-none focus:ring-2 focus:ring-primary">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-white mb-2">Description</label>
+            <textarea class="w-full px-3 py-2 rounded-lg glass text-white outline-none focus:ring-2 focus:ring-primary"
+                      rows="3">Secure user authentication and authorization</textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-white mb-2">Version</label>
+            <input type="text" value="v2.1"
+                   class="w-full px-3 py-2 rounded-lg glass text-white outline-none focus:ring-2 focus:ring-primary">
+          </div>
+        </div>
+      </div>
+
+      <!-- Security Settings -->
+      <div class="glass rounded-lg p-6">
+        <h3 class="text-lg font-bold text-white mb-4">Security Settings</h3>
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-white">Rate Limiting</span>
+            <input type="checkbox" checked class="w-5 h-5 text-primary">
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-white">API Key Required</span>
+            <input type="checkbox" checked class="w-5 h-5 text-primary">
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-white">CORS Enabled</span>
+            <input type="checkbox" checked class="w-5 h-5 text-primary">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-white mb-2">Rate Limit (requests/minute)</label>
+            <input type="number" value="1000"
+                   class="w-full px-3 py-2 rounded-lg glass text-white outline-none focus:ring-2 focus:ring-primary">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function switchTab(tabName) {
+    // Hide all tabs
+    document.querySelectorAll('.tab-content').forEach(tab => {
+      tab.classList.add('hidden');
+    });
+
+    // Remove active class from all buttons
+    document.querySelectorAll('.tab-button').forEach(button => {
+      button.classList.remove('active');
+    });
+
+    // Show selected tab
+    document.getElementById(tabName + '-tab').classList.remove('hidden');
+
+    // Add active class to clicked button
+    event.target.classList.add('active');
+  }
+
+  // Initialize with entities tab active
+  document.addEventListener('DOMContentLoaded', function () {
+    switchTab('entities');
+  });
+</script>

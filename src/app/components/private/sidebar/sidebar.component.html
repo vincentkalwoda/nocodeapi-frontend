@@ -1,0 +1,41 @@
+<div class="fixed pt-20 min-h-screen">
+  <div class="ml-4">
+    <p-menu [model]="items" class="block fixed md:hidden mobile">
+      <ng-template pTemplate="item" let-item>
+        <div class="p-menuitem-content rounded-md"
+             [ngStyle]="{'background-color': isActive(item) ? '#0127d7' : 'inherit', 'color': isActive(item) ? '#ffffff' : 'inherit'}"
+        >
+          <a [routerLink]="item.route"
+             class="p-menuitem-link"
+             draggable="false">
+            <span [class]="item.icon"></span>
+          </a>
+        </div>
+      </ng-template>
+    </p-menu>
+
+    <p-menu [model]="items" class="hidden fixed md:block desktop">
+      <ng-template pTemplate="item" let-item>
+        <div class="p-menuitem-content rounded-md"
+             [ngStyle]="{'background-color': isActive(item) ? 'rgba(1, 39, 215, 0.2)' : 'inherit', 'color': isActive(item) ? '#ffffff' : 'inherit'}"
+        >
+          <a [routerLink]="item.route"
+             class="p-menuitem-link"
+             draggable="false">
+            <span [class]="item.icon"></span>
+            <span class="ml-2">
+              {{ item.label }}
+            </span>
+          </a>
+        </div>
+      </ng-template>
+    </p-menu>
+  </div>
+</div>
+
+<div class="bg-background">
+  <div class="pt-20 md:pl-64 pl-24 pr-3">
+    <router-outlet></router-outlet>
+  </div>
+  <app-footer></app-footer>
+</div>

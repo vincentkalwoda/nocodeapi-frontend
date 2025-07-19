@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+  background-color: black;
+}
+
+img {
+  -webkit-user-drag: none;
+}
+
+i.pi {
+  font-family: "primeicons" !important;
+}
+
+.box-shadow {
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+}
+
+body, footer {
+  background-color: #ffffff;
+}
+
+button {
+  user-select: none;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+::-webkit-scrollbar-button {
+  width: 0;
+  height: 0;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e1e1e1;
+  border: 0 none #ffffff;
+  border-radius: 50px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ffffff;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: #000000;
+}
+
+::-webkit-scrollbar-track {
+  background: #666666;
+  border: 0 none #ffffff;
+  border-radius: 50px;
+}
+
+::-webkit-scrollbar-track:hover {
+  background: #666666;
+}
+
+::-webkit-scrollbar-track:active {
+  background: #333333;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* styles.css oder styles.scss */
+
+.p-toast .p-toast-message {
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  box-shadow: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.p-toast .p-toast-summary {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.p-toast .p-toast-detail {
+  color: #d4d7e0;
+  font-size: 14px;
+}
+
+.p-toast .p-toast-message-success {
+  border-color: rgba(40, 167, 69, 0.5);
+  background: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+}
+
+.p-toast .p-toast-message-info {
+  border-color: rgba(23, 162, 184, 0.5);
+  background: rgba(23, 162, 184, 0.1);
+  color: #17a2b8;
+}
+
+.p-toast .p-toast-message-warn {
+  border-color: rgba(255, 193, 7, 0.5);
+  background: rgba(255, 193, 7, 0.1);
+  color: #ffc107;
+}
+
+.p-toast .p-toast-message-error {
+  border-color: rgba(220, 53, 69, 0.5);
+  background: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+}
+
+

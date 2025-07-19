@@ -1,0 +1,41 @@
+::ng-deep .p-menu {
+  backdrop-filter: blur(10px);
+  background: rgba(0, 14, 51, 0.37);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+::ng-deep .desktop .p-menu {
+  padding: 20px;
+  width: 230px;
+}
+
+::ng-deep .mobile .p-menu {
+  padding: 10px;
+  width: 63px !important;
+}
+
+::ng-deep .p-menuitem {
+  margin: 10px 0 !important;
+}
+
+::ng-deep .mobile .p-menuitem {
+  width: 40px;
+  height: 40px;
+}
+
+::ng-deep .mobile .p-menuitem-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+::ng-deep .p-menu .p-menuitem:not(.p-highlight):not(.p-disabled) > .p-menuitem-content:hover {
+  background: #0A001A;
+  color: #ffffff;
+}
+
+.p-menu .p-menuitem:not(.p-highlight):not(.p-disabled).p-focus > .p-menuitem-content {
+  background: transparent;
+}
