@@ -71,7 +71,7 @@ export class ApiDetailsComponent implements OnInit, AfterViewChecked {
           createdAt: new Date(project.createdAt)
         };
 
-        if (this.api.entities) {
+        if (this.api.entities && this.api.entities.length > 0) {
           this.loadEntities(this.api.apiKey);
           this.loadStats(apiKey);
           this.loadProjectState();
