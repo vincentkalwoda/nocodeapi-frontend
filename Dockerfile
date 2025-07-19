@@ -22,7 +22,7 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/build.log /usr/share/nginx/html/build.log
 
 # Copy compiled Angular app
-COPY --from=build /app/dist/nocodeapi /usr/share/nginx/html
+COPY --from=build /app/dist/nocodeapi/browser /usr/share/nginx/html
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
