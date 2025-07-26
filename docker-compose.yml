@@ -1,11 +1,11 @@
 version: "3.8"
 
 services:
-  angular-builder:
+  angular-init:
     build:
       context: .
     image: empleo/angular-build
-    command: tail -f /dev/null
+    command: sh -c "npm run build && cp -r dist/* /dist/ && echo 'Build complete'"
     volumes:
       - angular-dist:/dist
     networks:
