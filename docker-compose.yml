@@ -1,22 +1,20 @@
+version: "3.8"
+
 services:
-  angular:
-    container_name: nocodeapi-angular
+  angular-builder:
     build:
       context: .
-      network: host
-    restart: always
-    pull_policy: build
-    ports:
-      - 80:80
-      - 443:443
+    image: empleo/angular-build
+    command: tail -f /dev/null
     volumes:
-      - /etc/ssl/empleo_at.crt:/etc/ssl/cert.crt  # SSL-Zertifikat mounten
-      - /etc/ssl/empleo_at.key:/etc/ssl/cert.key  # Privater Schlüssel mounten
-      - /etc/ssl/empleo_at.ca-bundle:/etc/ssl/ca-bundle.crt
+      - angular-dist:/dist
     networks:
-      - nocodeapi-network
+      - system_api-network
 
+volumes:
+  angular-dist:
+    external: true
 
 networks:
-  nocodeapi-network:
-    driver: bridge
+  system_api-network:
+    external: true
