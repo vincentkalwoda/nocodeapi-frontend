@@ -17,4 +17,4 @@ volumes:
 
 networks:
   system_api-network:
-    external: true
+    driver: bridge
