@@ -65,14 +65,6 @@ Voraussetzungen:
 
 * Node.js
 
-Installation:
-
-npm install
-
-Starten:
-
-npm run start
-
 ---
 
 ## 🔌 Backend Verbindung
