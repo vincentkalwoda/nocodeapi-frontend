@@ -1,59 +1,92 @@
-# Nocodeapi
+# 🎨 NoCodeAPI Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.0.4.
+![Angular](https://img.shields.io/badge/Angular-18.2.13-red)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.5.4-blue)
+![PrimeNG](https://img.shields.io/badge/PrimeNG-17.18.15-0aa)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4.15-38bdf8)
+![Chart.js](https://img.shields.io/badge/Chart.js-4.5.0-lightgrey)
+![Status](https://img.shields.io/badge/Status-Work%20In%20Progress-yellow)
+![Type](https://img.shields.io/badge/Type-Private%20Project-purple)
 
-## Development server
+Frontend Anwendung für **NoCodeAPI**.
 
-To start a local development server, run:
+Das UI dient als Oberfläche zur Konfiguration und Verwaltung der Plattformfunktionen.
 
-```bash
-ng serve
-```
+---
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## 🚀 Features
 
-## Code scaffolding
+✔ Angular SPA
+✔ UI Komponenten via PrimeNG
+✔ Layout über PrimeFlex
+✔ Styling mit TailwindCSS
+✔ Visualisierung über Chart.js
+✔ UI Verbindungen via leader line
+✔ REST Kommunikation mit Backend
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+---
 
-```bash
-ng generate component component-name
-```
+## 🧰 Tech Stack
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### 🎨 Frontend
 
-```bash
-ng generate --help
-```
+* Angular 18.2.13
+* TypeScript 5.5.4
+* RxJS
 
-## Building
+### 🧩 UI
 
-To build the project run:
+* PrimeNG
+* PrimeIcons
+* PrimeFlex
 
-```bash
-ng build
-```
+### 🎨 Styling
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+* TailwindCSS
+* PostCSS
 
-## Running unit tests
+### 📊 Visualisierung
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+* Chart.js
+* leader line
 
-```bash
-ng test
-```
+### 🧪 Tooling
 
-## Running end-to-end tests
+* Angular CLI
+* ESLint
+* Karma
+* Jasmine
 
-For end-to-end (e2e) testing, run:
+---
 
-```bash
-ng e2e
-```
+## 🛠️ Setup
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Voraussetzungen:
 
-## Additional Resources
+* Node.js
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Installation:
+
+npm install
+
+Starten:
+
+npm run start
+
+---
+
+## 🔌 Backend Verbindung
+
+Backend Base URL muss über Environment Konfiguration gesetzt werden.
+
+---
+
+## 🔗 Zugehöriges Projekt
+
+[Backend Repository](https://github.com/vincentkalwoda/nocodeapi)
+
+---
+
+## 🚧 Status
+
+Work in Progress
